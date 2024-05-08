@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./stylish.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in/up Form</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+
+    </style>
+</head>
+
+<body>
+
+    <h2>Sign in/up Form</h2>
+    <div class="container" id="container">
+        <div class="form-container sign-up-container">
+            <form action="#">
+                <h1>Create Account</h1>
+                <span>or use your email for registration</span>
+                <br>
+                <input type="text" class="input" id="name" placeholder="Name" required>
+                <input type="number" class="input" id="age" placeholder="Age" required>
+                <input type="tel" class="input" id="phone" placeholder="Phone number" required>
+                <input type="email" class="input" id="email" placeholder="Email ID" required>
+                <input type="password" class="input" id="password" placeholder="Password" required>
+                <input type="password" class="input" id="confirmPassword" placeholder="Confirm Password" required>
+                <button onclick="signup()">Sign Up</button>
+            </form>
+        </div>
+        <div class="form-container sign-in-container">
+            <form id="loginForm" action="#">
+                <h1>Sign in</h1>
+                <span>or use your account</span>
+                <br>
+                <input type="email" id="loginEmail" placeholder="Email" required>
+                <input type="password" id="loginPassword" placeholder="Password" required>
+                <a href="#">Forgot your password?</a>
+                <button type="button" onclick="login()">Sign In</button>
+            </form>
+        </div>
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-left">
+                    <h1>Welcome Back!</h1>
+                    <p>To keep connected with us please login with your personal info</p>
+                    <button class="ghost" id="signIn">Sign In</button>
+                </div>
+                <div class="overlay-panel overlay-right">
+                    <h1>Hello, Friend!</h1>
+                    <p>Enter your personal details and start journey with us</p>
+                    <button class="ghost" id="signUp">Sign Up</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+   
+
+    <script>
+        function signup() {
+            var name = document.getElementById("name").value;
+            var age = document.getElementById("age").value;
+            var phone = document.getElementById("phone").value;
+            var email = document.getElementById("email").value;
+            var password = document.getElementById("password").value;
+            var confirmPassword = document.getElementById("confirmPassword").value;
+
+            // Reset previous error styles
+            resetValidationStyles();
+
+            // Check if any field is empty
+            if (!name || !age || !phone || !email || !password || !confirmPassword) {
+                applyRedBorderForEmptyFields();
+                return;
+            }
+
+            // Check if passwords match
+            if (password !== confirmPassword) {
+                alert("Password and Confirm Password do not match");
+                return;
+            }
+
+            // Validate email format
+            var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (email && !emailPattern.test(email)) {
+                alert("Invalid email format");
+                setValidationError("email");
+                document.getElementById("emailError").innerText = "Invalid email format";
+                return;
+            }
+
+            // Save data to local storage
+            var userData = {
+                name: name,
+                age: age,
+                phone: phone,
+                email: email,
+                password: password
+            };
+            localStorage.setItem('userData', JSON.stringify(userData));
+
+            // Show success message using SweetAlert
+            Swal.fire({
+                title: 'Success!',
+                text: 'Your account has been created successfully!',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                // Reset form after success
+                if (result.isConfirmed) {
+                    resetForm();
+                }
+            });
+        }
+
+        function resetForm() {
+            document.getElementById("name").value = "";
+            document.getElementById("age").value = "";
+            document.getElementById("phone").value = "";
+            document.getElementById("email").value = "";
+            document.getElementById("password").value = "";
+            document.getElementById("confirmPassword").value = "";
+            resetValidationStyles(); // Reset validation styles
+        }
+
+        function applyRedBorderForEmptyFields() {
+            var inputs = document.getElementsByClassName("input");
+            for (var i = 0; i < inputs.length; i++) {
+                if (!inputs[i].value) {
+                    inputs[i].style.borderColor = "red";
+                }
+            }
+        }
+
+        function resetValidationStyles() {
+            var inputs = document.getElementsByClassName("input");
+            for (var i = 0; i < inputs.length; i++) {
+                inputs[i].style.borderColor = "#ccc";
+            }
+        }
+
+
+        function login() {
+            var email = document.getElementById("loginEmail").value;
+            var password = document.getElementById("loginPassword").value;
+
+            // Check if email or password is empty
+            if (!email || !password) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Please enter both email and password'
+                });
+                return;
+            }
+
+            // Retrieve user data from local storage
+            var userData = JSON.parse(localStorage.getItem('userData'));
+
+            // Check if user data exists in local storage
+            if (!userData) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'No account found. Please sign up first.'
+                });
+                return;
+            }
+
+            // Verify email and password
+            if (email !== userData.email || password !== userData.password) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Invalid email or password'
+                });
+                return;
+            }
+
+            // Login successful
+            Swal.fire({
+                icon: 'success',
+                title: 'Login Successful!',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
+
+
+        const signUpButton = document.getElementById('signUp');
+        const signInButton = document.getElementById('signIn');
+        const container = document.getElementById('container');
+
+        signUpButton.addEventListener('click', () => {
+            container.classList.add("right-panel-active");
+        });
+
+        signInButton.addEventListener('click', () => {
+            container.classList.remove("right-panel-active");
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
+
+</html>
